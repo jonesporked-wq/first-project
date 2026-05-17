@@ -103,17 +103,34 @@
 
 
 
+import { useState } from 'react';
 import { Image } from 'expo-image';
-import { StyleSheet } from 'react-native'; 
-import { View, Text } from 'react-native';
+import { StyleSheet, View, Text, TextInput } from 'react-native';
 
 export default function App() {
+  const [name, setName] = useState('');
   return (
     <View style={s.screen}>
       <Image
         source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT5u0ykKLqe2RhYWpAbuxNEJSdrvWZWQ8kUA&s' }} //I change the photo into a funny pic of a bear
         style={s.photo}
       />
+      <TextInput
+        value={name}
+        placeholder="Type your name..."
+        onChangeText={setName}
+        style={{color: '#7c7c7c',
+          height: 40,
+          margin: 12,
+          borderWidth: 1,
+          padding: 10,
+          width: 200,
+        }}
+      />
+      <Text style={s.name}>
+        Hello, {name}!
+      </Text>
+      
       <Text style={s.name}>Jones Christian O. Juson</Text> {/*I changed the old name here into my own name*/}
       <Text style={s.bio}>MMA Student - CS126 - A302</Text> {/*I added my class section at the end of the bio*/}
     </View>
