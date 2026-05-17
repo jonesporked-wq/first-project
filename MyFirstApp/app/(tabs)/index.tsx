@@ -104,42 +104,96 @@
 
 
 import { useState } from 'react';
-import { Image } from 'expo-image';
-import { StyleSheet, View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, Button, Image, ScrollView, StyleSheet } from 'react-native';
 
 export default function App() {
+  
   const [name, setName] = useState('');
+  const [count, setCount] = useState(0);
+
+  
+  const message =
+    count > 0
+      ? `${name}, you tapped ${count} times!`
+      : 'Tap the + button to start';
+
   return (
-    <View style={s.screen}>
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Profile Image */}
       <Image
-        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT5u0ykKLqe2RhYWpAbuxNEJSdrvWZWQ8kUA&s' }} //I change the photo into a funny pic of a bear
-        style={s.photo}
+        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT5u0ykKLqe2RhYWpAbuxNEJSdrvWZWQ8kUA&s' }}
+        style={styles.image}
       />
+
+      {/* Input */}
       <TextInput
         value={name}
         placeholder="Type your name..."
         onChangeText={setName}
-        style={{color: '#7c7c7c',
-          height: 40,
-          margin: 12,
-          borderWidth: 1,
-          padding: 10,
-          width: 200,
-        }}
+        style={styles.input}
       />
-      <Text style={s.name}>
-        Hello, {name}!
+
+      {/* Greeting */}
+      <Text style={styles.text}>
+        {name === '' ? 'Please enter your name' : `Hello, ${name}!`}
       </Text>
-      
-      <Text style={s.name}>Jones Christian O. Juson</Text> {/*I changed the old name here into my own name*/}
-      <Text style={s.bio}>MMA Student - CS126 - A302</Text> {/*I added my class section at the end of the bio*/}
-    </View>
+
+      {/* Personal Info */}
+      <Text style={styles.name}>Jones Christian O. Juson</Text>
+      <Text style={styles.bio}>MMA Student - CS126 - A302</Text>
+
+      {/* Counter Message */}
+      <Text style={styles.text}>{message}</Text>
+
+      {/* Buttons */}
+      <View style={styles.buttonContainer}>
+        <Button title="+" onPress={() => setCount(count + 1)} />
+        <Button title="-" onPress={() => setCount(count - 1)} />
+        <Button title="Reset" onPress={() => setCount(0)} />
+      </View>
+    </ScrollView>
   );
 }
 
-const s = StyleSheet.create({
-    screen: {flex:1, backgroundColor: '#2c802b34', alignItems: 'center', justifyContent: 'center'}, //I changed background color into forest green or "#2c802b34"
-    photo: {width: 120, height: 120, borderRadius: 60},
-    name: {fontSize: 24, fontWeight: 'bold', marginTop: 16, color: '#b7b7b7'}, //I changed my name font color into color white
-    bio: {fontSize: 16, color: '#625b5b'}, //I changed my bio font color into a brownish shade
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#2c802b34',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 20
+  },
+  input: {
+    color: '#7c7c7c',
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: 200
+  },
+  text: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: '#625b5b'
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 16,
+    color: '#b7b7b7'
+  },
+  bio: {
+    fontSize: 16,
+    color: '#625b5b'
+  },
+  buttonContainer: {
+    marginTop: 10,
+    width: '60%'
+  }
 });
