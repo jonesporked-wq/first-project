@@ -1,23 +1,26 @@
-// Rainbow Coffee — Cart Screen
+// LuckyBeans — Cart Screen
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const parsePrice = (priceStr: string) => {
   return parseFloat(priceStr.replace('₱', '')) || 0;
 };
+
 
 export default function CartApp() {
   const [currentView, setCurrentView] = useState<'Cart' | 'OrderSummary'>('Cart');
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+ 
   // Note State Fields
   const [noteInput, setNoteInput] = useState('');
   const [savedNote, setSavedNote] = useState('');
   const [timestamp, setTimestamp] = useState('');
+
 
   // Simulates or handles network loading verification
   const loadCartAndNotes = async () => {
@@ -25,18 +28,21 @@ export default function CartApp() {
       setLoading(true);
       setError(null);
 
+
       // Simple connectivity check (Can hook into NetInfo if installed)
       // We simulate a ping check to make sure the internet is responsive
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
-      
+     
       await fetch('https://www.google.com', { mode: 'no-cors', signal: controller.signal });
       clearTimeout(timeoutId);
+
 
       // Load Cart Items locally
       const storedCart = await AsyncStorage.getItem('cart_items');
       if (storedCart) setCartItems(JSON.parse(storedCart));
       else setCartItems([]);
+
 
       // Load Saved Persistent Instruction
       const storedNoteJson = await AsyncStorage.getItem('@cart_instruction');
@@ -55,11 +61,13 @@ export default function CartApp() {
     }
   };
 
+
   useFocusEffect(
     useCallback(() => {
       loadCartAndNotes();
     }, [])
   );
+
 
   const handleSaveNote = async () => {
     if (!noteInput.trim()) {
@@ -68,6 +76,7 @@ export default function CartApp() {
     }
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const noteObject = { text: noteInput, time: timeNow };
+
 
     try {
       await AsyncStorage.setItem('@cart_instruction', JSON.stringify(noteObject));
@@ -79,6 +88,7 @@ export default function CartApp() {
       console.error(e);
     }
   };
+
 
   const handleClearNote = async () => {
     try {
@@ -92,6 +102,7 @@ export default function CartApp() {
     }
   };
 
+
   const handleRemoveItem = async (id: string) => {
     try {
       const updatedCart = cartItems.filter(item => item.id !== id);
@@ -102,30 +113,34 @@ export default function CartApp() {
     }
   };
 
+
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => sum + (parsePrice(item.price) * item.quantity), 0);
   };
+
 
   const handlePlaceOrder = async () => {
     Alert.alert("Success", "🎉 Order placed successfully!");
     await AsyncStorage.removeItem('cart_items');
     setCartItems([]);
-    setCurrentView('Cart'); 
+    setCurrentView('Cart');
   };
+
 
   // ─── Network Status Sub-Views ──────────────────────────────────────────────
   if (loading) {
     return (
-      <View style={[styles.container, styles.center, { backgroundColor: '#FDF6EE' }]}>
-        <ActivityIndicator size="large" color="#3E1F00" />
-        <Text style={{ marginTop: 12, color: '#3E1F00', fontWeight: '600' }}>Loading your cart...</Text>
+      <View style={[styles.container, styles.center, { backgroundColor: '#FAE3B1' }]}>
+        <ActivityIndicator size="large" color="#858461" />
+        <Text style={{ marginTop: 12, color: '#858461', fontWeight: '600' }}>Loading LuckyBeans Cart...</Text>
       </View>
     );
   }
 
+
   if (error) {
     return (
-      <View style={[styles.container, styles.center, { paddingHorizontal: 30, backgroundColor: '#FDF6EE' }]}>
+      <View style={[styles.container, styles.center, { paddingHorizontal: 30, backgroundColor: '#FAE3B1' }]}>
         <Text style={styles.errorText}>⚠️ {error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadCartAndNotes}>
           <Text style={styles.retryButtonText}>Try Again</Text>
@@ -134,6 +149,7 @@ export default function CartApp() {
     );
   }
 
+
   if (currentView === 'OrderSummary') {
     return (
       <View style={styles.container}>
@@ -141,7 +157,9 @@ export default function CartApp() {
           <Text style={styles.customHeaderTitle}>Order Summary</Text>
         </View>
 
+
         <Text style={styles.title}>📋 Order Summary</Text>
+
 
         <FlatList
           data={cartItems}
@@ -155,10 +173,12 @@ export default function CartApp() {
           )}
         />
 
+
         <View style={styles.totalContainer}>
           <Text style={styles.totalLabel}>Grand Total:</Text>
           <Text style={styles.totalPrice}>₱{calculateTotal()}</Text>
         </View>
+
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: '#C1440E', width: '90%', marginBottom: 10 }]}
@@ -166,6 +186,7 @@ export default function CartApp() {
         >
           <Text style={styles.buttonText}>Place Order</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: '#777', width: '90%', marginBottom: 20 }]}
@@ -177,11 +198,13 @@ export default function CartApp() {
     );
   }
 
+
   return (
     <View style={styles.container}>
       <View style={styles.customHeader}>
         <Text style={styles.customHeaderTitle}>🛒 My Cart</Text>
       </View>
+
 
       <View style={styles.instructionContainer}>
         <Text style={styles.instructionLabel}>SPECIAL INSTRUCTIONS:</Text>
@@ -196,6 +219,7 @@ export default function CartApp() {
           <Text style={styles.saveNoteButtonText}>Save Note</Text>
         </TouchableOpacity>
 
+
         {savedNote ? (
           <View style={styles.displayNoteBox}>
             <View style={{ marginBottom: 8 }}>
@@ -203,13 +227,14 @@ export default function CartApp() {
               <Text style={styles.savedNoteText}>{savedNote}</Text>
               <Text style={styles.timestampText}>Saved at {timestamp}</Text>
             </View>
-            
+           
             <TouchableOpacity style={styles.clearNoteButton} onPress={handleClearNote}>
               <Text style={styles.clearNoteButtonText}>Remove Instruction</Text>
             </TouchableOpacity>
           </View>
         ) : null}
       </View>
+
 
       {cartItems.length === 0 ? (
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -235,10 +260,12 @@ export default function CartApp() {
             )}
           />
 
+
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>Total Amount:</Text>
             <Text style={styles.totalPrice}>₱{calculateTotal()}</Text>
           </View>
+
 
           <TouchableOpacity
             style={[styles.button, { width: '90%', marginBottom: 20 }]}
@@ -252,36 +279,38 @@ export default function CartApp() {
   );
 }
 
+
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', backgroundColor: '#FDF6EE' },
+  container: { flex: 1, alignItems: 'center', backgroundColor: '#FAE3B1' },
   center: { justifyContent: 'center', alignItems: 'center' },
-  customHeader: { width: '100%', backgroundColor: '#3E1F00', paddingVertical: 15, alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
-  customHeaderTitle: { color: '#F5F5F5', fontSize: 18, fontWeight: 'bold' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 15, color: '#3E1F00' },
-  button: { backgroundColor: '#3E1F00', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  cartItem: { flexDirection: 'row', backgroundColor: '#FFF8F2', padding: 12, borderRadius: 10, marginBottom: 10, alignItems: 'center', elevation: 1 },
+  customHeader: { width: '100%', backgroundColor: '#858461', paddingVertical: 15, alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
+  customHeaderTitle: { color: '#FAE3B1', fontSize: 18, fontWeight: 'bold' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 15, color: '#858461' },
+  button: { backgroundColor: '#858461', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  buttonText: { color: '#FAE3B1', fontSize: 16, fontWeight: 'bold' },
+  cartItem: { flexDirection: 'row', backgroundColor: '#FAE9C5', padding: 12, borderRadius: 10, marginBottom: 10, alignItems: 'center', elevation: 1 },
   cartThumbnail: { width: 50, height: 50, borderRadius: 6, marginRight: 12 },
-  itemName: { fontSize: 16, fontWeight: '600', color: '#3E1F00' },
-  itemPrice: { color: '#C1440E', marginTop: 2 },
-  removeText: { color: '#ff4444', fontWeight: '600' },
-  totalContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '90%', paddingVertical: 15, borderTopWidth: 1, borderTopColor: '#E6D7C3', marginTop: 10 },
-  totalLabel: { fontSize: 18, fontWeight: 'bold', color: '#3E1F00' },
-  totalPrice: { fontSize: 18, fontWeight: 'bold', color: '#C1440E' },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#F5E6D3' },
-  summaryText: { fontSize: 16, color: '#555' },
+  itemName: { fontSize: 16, fontWeight: '600', color: '#858461' },
+  itemPrice: { color: '#858461', marginTop: 2 },
+  removeText: { color: '#858461', fontWeight: '600' },
+  totalContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '90%', paddingVertical: 15, borderTopWidth: 1, borderTopColor: '#858461', marginTop: 10 },
+  totalLabel: { fontSize: 18, fontWeight: 'bold', color: '#858461' },
+  totalPrice: { fontSize: 18, fontWeight: 'bold', color: '#858461' },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#858461' },
+  summaryText: { fontSize: 16, color: '#858461' },
   instructionContainer: { width: '90%', marginBottom: 15 },
-  instructionLabel: { fontSize: 11, fontWeight: 'bold', color: '#555', marginBottom: 4 },
-  inputField: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, color: '#3E1F00', marginBottom: 8 },
-  saveNoteButton: { backgroundColor: '#004d26', paddingVertical: 12, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
-  saveNoteButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  displayNoteBox: { backgroundColor: '#eef9f3', padding: 12, borderRadius: 5, borderWidth: 1, borderColor: '#d0ebd9', marginBottom: 5 },
-  savedNoteLabel: { fontSize: 11, fontWeight: 'bold', color: '#004d26' },
+  instructionLabel: { fontSize: 11, fontWeight: 'bold', color: '#858461', marginBottom: 4 },
+  inputField: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#858461', padding: 10, borderRadius: 5, color: '#858461', marginBottom: 8 },
+  saveNoteButton: { backgroundColor: '#858461', paddingVertical: 12, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
+  saveNoteButtonText: { color: '#FAE3B1', fontWeight: 'bold', fontSize: 14 },
+  displayNoteBox: { backgroundColor: '#FAE9C5', padding: 12, borderRadius: 5, borderWidth: 1, borderColor: '#858461', marginBottom: 5 },
+  savedNoteLabel: { fontSize: 11, fontWeight: 'bold', color: '#858461' },
   savedNoteText: { fontSize: 15, color: '#222', marginVertical: 3, fontWeight: '500' },
-  timestampText: { fontSize: 11, color: '#777' },
-  clearNoteButton: { backgroundColor: '#ff4444', paddingVertical: 8, borderRadius: 5, alignItems: 'center' },
-  clearNoteButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
+  timestampText: { fontSize: 11, color: '#858461' },
+  clearNoteButton: { backgroundColor: '#858461', paddingVertical: 8, borderRadius: 5, alignItems: 'center' },
+  clearNoteButtonText: { color: '#FAE3B1', fontWeight: 'bold', fontSize: 13 },
   errorText: { color: 'red', fontSize: 16, textAlign: 'center', fontWeight: '500', marginBottom: 15 },
-  retryButton: { backgroundColor: '#3E1F00', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 6 },
-  retryButtonText: { color: '#FDF6EE', fontWeight: 'bold' }
+  retryButton: { backgroundColor: '#858461', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 6 },
+  retryButtonText: { color: '#FAE3B1', fontWeight: 'bold' }
 });
+
