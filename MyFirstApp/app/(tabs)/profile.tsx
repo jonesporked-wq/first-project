@@ -79,11 +79,11 @@ export default function ProfileScreen() {
         <Text style={styles.saveBtnText}>Save Profile Name</Text>
       </TouchableOpacity>
 
-      <Text style={styles.email}>I love you💞</Text>
+      <Text style={styles.email}>Welcome back, coffee lover! ☕</Text>
 
       <View style={styles.card}>
         <Text style={styles.label}>Member Since</Text>
-        <Text style={styles.value}>January 2024</Text>
+        <Text style={styles.value}>January 2026</Text>
       </View>
 
       <View style={styles.card}>
